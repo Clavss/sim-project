@@ -47,8 +47,14 @@ class Camera {
 
   // access 
   inline glm::mat4 projMatrix() const {return mat4ToGlm(_matp);}
-  inline glm::mat4 mdvMatrix () const {return mat4ToGlm(_matm);}
-  inline glm::mat3 normalMatrix () const {return glm::mat3(glm::inverseTranspose(mdvMatrix()));}
+  inline glm::mat4 mdvMatrix() const {return mat4ToGlm(_matm);}
+  inline glm::mat3 normalMatrix() const {return glm::mat3(glm::inverseTranspose(mdvMatrix()));}
+	inline float getRadius() const {return _r;}
+
+	// my fonctions
+	inline void addX(const float x);
+	inline void addY(const float y);
+	inline void addZ(const float z);
 
  protected:
   inline void rotate(const Vec2f &p);
@@ -186,6 +192,29 @@ inline void Camera::moveZ(const Vec2f &p) {
 
   // update params 
   _p = p;
+  updateCamDists(_matm);
+}
+
+inline void Camera::addX(const float x) {
+  const float s = _r/300.0;
+
+  _matm = _matm.translateEq(Vec3f(x*s,0.0f,0.0f));
+  _p[0] += x;
+  updateCamDists(_matm);
+}
+
+inline void Camera::addY(const float y) {
+  const float s = _r/300.0;
+
+  _matm = _matm.translateEq(Vec3f(0.0f,y*s,0.0f));
+  _p[1] += y;
+  updateCamDists(_matm);
+}
+
+inline void Camera::addZ(const float z) {
+  const float s = _r/300.0;
+  
+  _matm = _matm.translateEq(Vec3f(0.0f,0.0f,z*s));
   updateCamDists(_matm);
 }
 

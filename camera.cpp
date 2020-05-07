@@ -46,7 +46,7 @@ void Camera::initialize(int w,int h,bool replace) {
   // camera transformations
   _matm = glmToMat4(glm::lookAt(glm::vec3(_c[0],_c[1],_c[2]+tmp2*_r),
 				glm::vec3(_c[0],_c[1],_c[2]),
-				glm::vec3(0.0,1.0,0.0)));
+				glm::vec3(1.0,0.0,0.0)));
 
   // update params 
   updateCamVectors(_matm);

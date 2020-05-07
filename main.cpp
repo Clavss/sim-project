@@ -7,28 +7,20 @@
 
 using namespace std;
 
-char *getFilename(int ,char **argv) {
-  //if(argc<2) {
-    //cout << "Usage: " << argv[0] << " offFile" << endl;
-    //exit(0);
-  //}
-
-  return argv[0];
-}
-
-
 int main(int argc,char** argv) {
   QApplication application(argc,argv);
 
-	/*
 	QGLFormat fmt;
 	fmt.setVersion(3, 3);
 	fmt.setProfile(QGLFormat::CoreProfile);
 	fmt.setSampleBuffers(true);
+	/*
+		S'il y a des problemes de version de GLSL
+		export MESA_GL_VERSION_OVERRIDE=3.3 (normalement pas besoin grace aux lignes ci-dessus)
+		export MESA_GLSL_VERSION_OVERRIDE=330
+	*/
 
-  Viewer viewer(getFilename(argc,argv), fmt);
-  */
-  Viewer viewer(getFilename(argc,argv));
+  Viewer viewer(argv[0], fmt);
 
   viewer.setWindowTitle("Exercice 09 - Terrain rendering");
   viewer.show();

@@ -42,6 +42,10 @@ class Viewer : public QGLWidget {
   // OpenGL objects creation
   void createVAO();
   void deleteVAO();
+  
+  void createTextures();
+  void deleteTextures();
+  void loadTexture(GLuint id, const char *filename);
 
 	void createFBO();
   void deleteFBO();
@@ -51,23 +55,37 @@ class Viewer : public QGLWidget {
   void reloadShaders();
   
   // drawing functions 
-  void drawScene(GLuint id);
-
-  QTimer        *_timer;    // timer that controls the animation
+  void drawSceneFromCamera(GLuint id);
+  void drawSceneFromLight(GLuint id);
+  void drawShadowMap(GLuint id);
+  
+  // animation
+  void animation();
 
   Grid   *_grid;   // the grid
   Camera *_cam;    // the camera
 
+	QTimer *_timer;
   glm::vec3 _light;  // light direction
   glm::vec3 _motion; // motion offset for the noise texture 
   bool      _mode;   // camera motion or light motion
+  bool			_showShadowMap;
+  bool			_animation;    // boolean that controls the animation
 
-  // les shaders 
+  // les shaders
+  Shader *_shadowMapShader;
   Shader *_terrainShader;
+  Shader *_debugShader;
   
   // vbo/vao ids 
   GLuint _vaoTerrain;
   GLuint _terrain[2];
+  GLuint _vaoQuad;
+  GLuint _quad;
+  
+  // texture ids
+  GLuint _texColor;
+  GLuint _texNormal;
   
   // fbo id and associated depth texture 
   GLuint _fbo;
