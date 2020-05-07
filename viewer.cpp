@@ -112,21 +112,34 @@ void Viewer::createVAO() {
 	const GLfloat quadData[] = {
 		-1.0f,-1.0f,0.0f, 1.0f,-1.0f,0.0f, -1.0f,1.0f,0.0f, -1.0f,1.0f,0.0f, 1.0f,-1.0f,0.0f, 1.0f,1.0f,0.0f
 	};
+	/*
+	const GLfloat terrainData[] = {
+		0.0f,0.0f, 1.0f,0.0f, 1.0f,1.0f, 1.0f,1.0f, 0.0f,1.0f, 0.0f,0.0f
+	};
+	*/
 
   // cree les buffers associés au terrain 
-  glGenBuffers(2,_terrain);
-  glGenVertexArrays(1,&_vaoTerrain);
+  glGenBuffers(2, _terrain);
+  glGenVertexArrays(1, &_vaoTerrain);
   glGenVertexArrays(1, &_vaoQuad);
 
   // create the VBO associated with the grid (the terrain)
   glBindVertexArray(_vaoTerrain);
+  
   glBindBuffer(GL_ARRAY_BUFFER,_terrain[0]); // vertices 
   glBufferData(GL_ARRAY_BUFFER,_grid->nbVertices()*3*sizeof(float),_grid->vertices(),GL_STATIC_DRAW);
   glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,(void *)0);
   glEnableVertexAttribArray(0);
   
+  /*
+	glBindBuffer(GL_ARRAY_BUFFER,_terrain[1]); // coord 
+  glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), &terrainData[0], GL_STATIC_DRAW);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+  glEnableVertexAttribArray(1);
+  */
+  
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,_terrain[1]); // indices 
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER,_grid->nbFaces()*3*sizeof(int),_grid->faces(),GL_STATIC_DRAW); 
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,_grid->nbFaces()*3*sizeof(int),_grid->faces(),GL_STATIC_DRAW);
   
   glGenBuffers(1, &_quad);
   glBindVertexArray(_vaoQuad);

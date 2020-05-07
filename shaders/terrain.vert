@@ -1,7 +1,8 @@
 #version 330
 
 // input attributes 
-layout(location = 0) in vec3 position; 
+layout(location = 0) in vec3 position;
+//layout(location = 1) in vec2 coord;
 
 // input uniforms
 uniform mat4 mdvMat;      // modelview matrix 
@@ -9,11 +10,14 @@ uniform mat4 projMat;     // projection matrix
 uniform mat3 normalMat;   // normal matrix
 uniform vec3 light;
 uniform vec3 motion;
+uniform mat4 mvpDepthMat;
 
 // out variables 
 out vec3 normalView;
 out vec3 eyeView;
 out float h;
+//out vec2 uvcoord;
+out vec4 shadcoord;
 
 // fonctions utiles pour créer des terrains en général
 vec2 hash(vec2 p) {
@@ -77,7 +81,9 @@ void main() {
   
   vec3 p = vec3(position.xy,h);
   
-  gl_Position =  projMat*mdvMat*vec4(p,1);
+  gl_Position = projMat*mdvMat*vec4(p,1);
   normalView  = normalize(normalMat*n);
   eyeView     = normalize((mdvMat*vec4(p,1.0)).xyz);
+  //uvcoord			= coord * 5.0;
+  shadcoord		= (mvpDepthMat*vec4(p, 1.0))*0.5+vec4(0.5);
 }

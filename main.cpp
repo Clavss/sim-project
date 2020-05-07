@@ -15,8 +15,8 @@ int main(int argc,char** argv) {
 	fmt.setProfile(QGLFormat::CoreProfile);
 	fmt.setSampleBuffers(true);
 	/*
-		S'il y a des problemes de version de GLSL
-		export MESA_GL_VERSION_OVERRIDE=3.3 (normalement pas besoin grace aux lignes ci-dessus)
+		S'il y a des problemes de versions de GLSL
+		export MESA_GL_VERSION_OVERRIDE=3.3
 		export MESA_GLSL_VERSION_OVERRIDE=330
 	*/
 

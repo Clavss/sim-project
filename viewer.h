@@ -79,7 +79,7 @@ class Viewer : public QGLWidget {
   
   // vbo/vao ids 
   GLuint _vaoTerrain;
-  GLuint _terrain[2];
+  GLuint _terrain[3];
   GLuint _vaoQuad;
   GLuint _quad;
   
