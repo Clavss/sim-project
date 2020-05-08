@@ -52,13 +52,11 @@ float pnoise(in vec2 p,in float amplitude,in float frequency,in float persistenc
   return n;
 }
 
-
 float computeHeight(in vec2 p) {
   // sinus animé
   return 0.1*sin((pnoise(p, 0.5, 0.5, 0.5, 2)+motion.x)*12);
   //return 0.1*sin((pnoise(p, 0.5, 0.1, 0.1, 2)+motion.x)*15);
 }
-
 
 vec3 computeNormal(in vec2 p) {
   const float EPS = 0.01;

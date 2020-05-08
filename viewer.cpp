@@ -14,11 +14,11 @@ Viewer::Viewer(char *,const QGLFormat &format)
     _mode(false),
     _showShadowMap(false),
     _animation(true),
-    _ndResol(512) {
+    _ndResol(256) {
 
   setlocale(LC_ALL,"C");
 
-  _grid = new Grid(_ndResol,-5.0f,5.0f);
+  _grid = new Grid(_ndResol,-1.0f,1.0f);
   _cam  = new Camera(3.0f,glm::vec3(0.0f,0.0f,0.0f));
 
   _timer->setInterval(1);
@@ -381,7 +381,7 @@ void Viewer::keyPressEvent(QKeyEvent *ke) {
     _cam->initialize(width(),height(),true);
   }
   
-  // key f: compute FPS
+  /*// key f: compute FPS
   if(ke->key()==Qt::Key_F) {
      int elapsed;
      QTime timer;
@@ -392,8 +392,8 @@ void Viewer::keyPressEvent(QKeyEvent *ke) {
      }
      elapsed = timer.elapsed();
      double t = (double)nb/((double)elapsed);
-     cout << "FPS : " << t << endl;
-   }
+     cout << "FPS : " << t*1000 << endl;
+   }*/
 
   // key r: reload shaders 
   if (ke->key()==Qt::Key_R) {
@@ -413,11 +413,11 @@ void Viewer::initializeGL() {
   makeCurrent();
 
   // init and chack glew
-  if(glewInit()!=GLEW_OK) {
+  if (glewInit()!=GLEW_OK) {
     cerr << "Warning: glewInit failed!" << endl;
   }
 
-  if(!GLEW_ARB_vertex_program   ||
+  if (!GLEW_ARB_vertex_program   ||
      !GLEW_ARB_fragment_program ||
      !GLEW_ARB_texture_float    ||
      !GLEW_ARB_draw_buffers     ||
