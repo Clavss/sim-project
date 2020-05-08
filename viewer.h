@@ -65,12 +65,14 @@ class Viewer : public QGLWidget {
   Grid   *_grid;   // the grid
   Camera *_cam;    // the camera
 
-	QTimer *_timer;
-  glm::vec3 _light;  // light direction
-  glm::vec3 _motion; // motion offset for the noise texture 
-  bool      _mode;   // camera motion or light motion
-  bool			_showShadowMap;
-  bool			_animation;    // boolean that controls the animation
+	QTimer				*_timer;			// timer to refresh the drawing
+  glm::vec3 		_light;				// light direction
+  glm::vec3 		_motion; 			// motion offset for the noise texture 
+  bool      		_mode;   			// camera motion or light motion
+  bool					_showShadowMap;
+  bool					_animation;		// boolean that controls the animation
+  unsigned int	_ndResol;
+	float					_len; 				// terrain is of size len*len 
 
   // les shaders
   Shader *_shadowMapShader;
@@ -90,8 +92,6 @@ class Viewer : public QGLWidget {
   // fbo id and associated depth texture 
   GLuint _fbo;
   GLuint _texDepth;
-
-  unsigned int _ndResol;
 };
 
 #endif // VIEWER_H

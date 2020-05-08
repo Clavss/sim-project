@@ -14,12 +14,13 @@ Viewer::Viewer(char *,const QGLFormat &format)
     _mode(false),
     _showShadowMap(false),
     _animation(true),
-    _ndResol(256) {
+    _ndResol(32),
+    _len(1.0) {
 
   setlocale(LC_ALL,"C");
 
-  _grid = new Grid(_ndResol,-1.0f,1.0f);
-  _cam  = new Camera(3.0f,glm::vec3(0.0f,0.0f,0.0f));
+  _grid = new Grid(_ndResol, -_len, _len);
+  _cam  = new Camera(sqrt(_len), glm::vec3(0.0f,0.0f,0.0f));
 
   _timer->setInterval(1);
   connect(_timer,SIGNAL(timeout()),this,SLOT(updateGL()));
@@ -56,7 +57,7 @@ void Viewer::createFBO() {
 
   // create the texture for rendering depth values
   glBindTexture(GL_TEXTURE_2D,_texDepth);
-  glTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT24,_ndResol,_ndResol,0,GL_DEPTH_COMPONENT,GL_FLOAT,NULL);
+  glTexImage2D(GL_TEXTURE_2D,0,GL_DEPTH_COMPONENT24,width(),height(),0,GL_DEPTH_COMPONENT,GL_FLOAT,NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -87,8 +88,8 @@ void Viewer::loadTexture(GLuint id, const char *filename) {
 	// set textute parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	
 	// store texture in the GPU
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width(), image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, (const GLvoid *)image.bits());
@@ -112,14 +113,10 @@ void Viewer::createVAO() {
 	const GLfloat quadData[] = {
 		-1.0f,-1.0f,0.0f, 1.0f,-1.0f,0.0f, -1.0f,1.0f,0.0f, -1.0f,1.0f,0.0f, 1.0f,-1.0f,0.0f, 1.0f,1.0f,0.0f
 	};
-	/*
-	const GLfloat terrainData[] = {
-		0.0f,0.0f, 1.0f,0.0f, 1.0f,1.0f, 1.0f,1.0f, 0.0f,1.0f, 0.0f,0.0f
-	};
-	*/
 
   // cree les buffers associés au terrain 
   glGenBuffers(2, _terrain);
+  glGenBuffers(1, &_quad);
   glGenVertexArrays(1, &_vaoTerrain);
   glGenVertexArrays(1, &_vaoQuad);
 
@@ -131,17 +128,9 @@ void Viewer::createVAO() {
   glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,0,(void *)0);
   glEnableVertexAttribArray(0);
   
-  /*
-	glBindBuffer(GL_ARRAY_BUFFER,_terrain[1]); // coord 
-  glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), &terrainData[0], GL_STATIC_DRAW);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
-  glEnableVertexAttribArray(1);
-  */
-  
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,_terrain[1]); // indices 
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,_grid->nbFaces()*3*sizeof(int),_grid->faces(),GL_STATIC_DRAW);
   
-  glGenBuffers(1, &_quad);
   glBindVertexArray(_vaoQuad);
   glBindBuffer(GL_ARRAY_BUFFER, _quad);
   glBufferData(GL_ARRAY_BUFFER, sizeof(quadData), quadData, GL_STATIC_DRAW);
@@ -240,7 +229,7 @@ void Viewer::drawSceneFromCamera(GLuint id) {
 
 void Viewer::drawSceneFromLight(GLuint id) {
 	// mdv matrix from the light point of view
-	const float size = _cam->getRadius()*10;
+	const float size = _cam->getRadius()*5;
 	glm::vec3 l = glm::transpose(_cam->normalMatrix())*_light;
 	glm::mat4 p = glm::ortho<float>(-size, size, -size, size, -size, 2*size);
 	glm::mat4 v = glm::lookAt(l, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
@@ -266,7 +255,7 @@ void Viewer::drawShadowMap(GLuint id) {
 	
 	// draw the quad
 	glBindVertexArray(_vaoQuad);
-	glDrawElements(GL_TRIANGLES,3*_grid->nbFaces(),GL_UNSIGNED_INT,(void *)0);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
 	
 	// disable VAO
   glBindVertexArray(0);
@@ -278,8 +267,10 @@ void Viewer::paintGL() {
   
   glBindFramebuffer(GL_FRAMEBUFFER, _fbo);
   glDrawBuffer(GL_NONE);
-  glViewport(0, 0, _ndResol, _ndResol);
+  glViewport(0, 0, width(), height());
   glClear(GL_DEPTH_BUFFER_BIT);
+  
+  // First pass
   glUseProgram(_shadowMapShader->id());
   drawSceneFromLight(_shadowMapShader->id());
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -287,7 +278,7 @@ void Viewer::paintGL() {
   // screen viewport
   glViewport(0,0,width(),height());
 
-  // activate the buffer shader 
+  // Second pass 
   glUseProgram(_terrainShader->id());
 
 	// clear buffers
@@ -297,6 +288,7 @@ void Viewer::paintGL() {
   drawSceneFromCamera(_terrainShader->id());
 
 	if (_showShadowMap) {
+		// Third pass
 		glUseProgram(_debugShader->id());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		drawShadowMap(_debugShader->id());

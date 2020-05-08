@@ -2,7 +2,6 @@
 
 // input attributes 
 layout(location = 0) in vec3 position;
-//layout(location = 1) in vec2 coord;
 
 // input uniforms
 uniform mat4 mdvMat;      // modelview matrix 
@@ -16,7 +15,7 @@ uniform mat4 mvpDepthMat;
 out vec3 normalView;
 out vec3 eyeView;
 out float h;
-//out vec2 uvcoord;
+out vec2 uvcoord;
 out vec4 shadcoord;
 
 // fonctions utiles pour créer des terrains en général
@@ -82,6 +81,6 @@ void main() {
   gl_Position = projMat*mdvMat*vec4(p,1);
   normalView  = normalize(normalMat*n);
   eyeView     = normalize((mdvMat*vec4(p,1.0)).xyz);
-  //uvcoord			= coord * 5.0;
+  uvcoord			= p.xy * 0.5 + 0.5;
   shadcoord		= (mvpDepthMat*vec4(p, 1.0))*0.5+vec4(0.5);
 }
