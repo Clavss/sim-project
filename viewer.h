@@ -48,16 +48,21 @@ class Viewer : public QGLWidget {
   void loadTexture(GLuint id, const char *filename);
 
 	void createFBO();
+	void initFBO();
   void deleteFBO();
 
   void createShaders();
   void deleteShaders();
   void reloadShaders();
   
-  // drawing functions 
-  void drawSceneFromCamera(GLuint id);
+  // drawing functions (one for each pass/shader)
+  void drawNoise(GLuint id);
   void drawSceneFromLight(GLuint id);
   void drawShadowMap(GLuint id);
+  void drawSceneFromCamera(GLuint id);
+  void drawPostProcess(GLuint id);
+  
+  void drawQuad();
   
   // animation
   void animation();
@@ -75,23 +80,40 @@ class Viewer : public QGLWidget {
 	float					_len; 				// terrain is of size len*len 
 
   // les shaders
+  Shader *_noiseShader;
   Shader *_shadowMapShader;
-  Shader *_terrainShader;
   Shader *_debugShader;
+  Shader *_terrainShader;
+  Shader *_postProcessShader;
   
-  // vbo/vao ids 
+  // vbo/vao ids
   GLuint _vaoTerrain;
   GLuint _terrain[2];
   GLuint _vaoQuad;
   GLuint _quad;
   
-  // texture ids
-  GLuint _texColor;
-  GLuint _texNormal;
+  // imported texture ids
+  GLuint _texWater;
+  GLuint _texRock;
   
-  // fbo id and associated depth texture 
-  GLuint _fbo;
+  // fbo id and associated shader textures
+  // noiseShader
+  GLuint _fboNoise;
+  
+  GLuint _texNormal;
+  GLuint _texHeight;
+  
+  // shadowShader
+  GLuint _fboShadow;
+  
   GLuint _texDepth;
+  
+  // terrainShader
+  GLuint _fboTerrain;
+  
+  GLuint _texTerrainColor;
+  GLuint _texTerrainNormal;
+  GLuint _texTerrainDepth;
 };
 
 #endif // VIEWER_H
