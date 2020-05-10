@@ -26,7 +26,7 @@ void main() {
 
 	#if FOG_EFFECT
 		vec4 fogcolor = vec4(vec3(0.8), 1.0);
-		float depth = clamp(texture2D(normalmap, newcoord).w, 0.0, 1.0);
+		float depth = max(0, min(1, texture2D(normalmap, newcoord).w));
 		outBuffer = (1 - depth) * color + depth * fogcolor;
 	#else
 		outBuffer = color;

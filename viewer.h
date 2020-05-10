@@ -72,12 +72,13 @@ class Viewer : public QGLWidget {
 
 	QTimer				*_timer;			// timer to refresh the drawing
   glm::vec3 		_light;				// light direction
-  glm::vec3 		_motion; 			// motion offset for the noise texture 
+  glm::vec3 		_motion; 			// motion offset for the noise texture
   bool      		_mode;   			// camera motion or light motion
   bool					_showShadowMap;
   bool					_animation;		// boolean that controls the animation
   unsigned int	_ndResol;
-	float					_len; 				// terrain is of size len*len 
+	float					_len; 				// terrain is of size len*len
+	int 					_currentTexture;
 
   // les shaders
   Shader *_noiseShader;
@@ -93,8 +94,7 @@ class Viewer : public QGLWidget {
   GLuint _quad;
   
   // imported texture ids
-  GLuint _texWater;
-  GLuint _texRock;
+  GLuint _texWater[5];
   
   // fbo id and associated shader textures
   // noiseShader

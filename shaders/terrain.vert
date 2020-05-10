@@ -29,6 +29,6 @@ void main() {
   gl_Position = projMat*mdvMat*vec4(pos,1);
   normalView  = normalize(normalMat * texture2D(normalmap, texcoord).xyz);
   eyeView     = normalize((mdvMat * vec4(position, 1.0)).xyz);
-  depth				= (mdvMat * vec4(pos, 1.0)).z;
+  depth				= -(mdvMat * vec4(pos, 1.0)).z / 5;
   shadcoord		= mvpMat * vec4(pos, 1.0) * 0.5 + 0.5;
 }

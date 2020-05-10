@@ -15,7 +15,8 @@ Viewer::Viewer(char *,const QGLFormat &format)
     _showShadowMap(false),
     _animation(true),
     _ndResol(64),
-    _len(1.0) {
+    _len(1.0),
+    _currentTexture(0) {
 
   setlocale(LC_ALL,"C");
 
@@ -40,8 +41,7 @@ Viewer::~Viewer() {
 
 void Viewer::deleteTextures() {
 	// delete loaded textures
-	glDeleteTextures(1, &_texWater);
-	glDeleteTextures(1, &_texRock);
+	glDeleteTextures(5, _texWater);
 }
 
 void Viewer::deleteFBO() {
@@ -196,12 +196,14 @@ void Viewer::loadTexture(GLuint id, const char *filename) {
 
 void Viewer::createTextures() {
 	// generate texture ids
-	glGenTextures(1, &_texWater);
-	glGenTextures(1, &_texRock);
+	glGenTextures(5, _texWater);
 	
 	// load all needed textures
-	loadTexture(_texWater, "textures/water.jpg");
-	loadTexture(_texRock, "textures/rock.jpg");
+	loadTexture(_texWater[0], "textures/water1.jpg");
+	loadTexture(_texWater[1], "textures/water2.jpg");
+	loadTexture(_texWater[2], "textures/water3.jpg");
+	loadTexture(_texWater[3], "textures/water4.jpg");
+	loadTexture(_texWater[4], "textures/water5.jpg");
 }
 
 void Viewer::createVAO() {
@@ -347,20 +349,16 @@ void Viewer::drawSceneFromCamera(GLuint id) {
 
 	// send textures (imported & fbo)
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _texWater);
+	glBindTexture(GL_TEXTURE_2D, _texWater[_currentTexture]);
 	glUniform1i(glGetUniformLocation(id, "texWater"), 0);
 	
 	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, _texRock);
-	glUniform1i(glGetUniformLocation(id, "texRock"), 1);
+	glBindTexture(GL_TEXTURE_2D, _texNormal);
+	glUniform1i(glGetUniformLocation(id, "normalmap"), 1);
 	
 	glActiveTexture(GL_TEXTURE0 + 2);
-	glBindTexture(GL_TEXTURE_2D, _texNormal);
-	glUniform1i(glGetUniformLocation(id, "normalmap"), 2);
-	
-	glActiveTexture(GL_TEXTURE0 + 3);
 	glBindTexture(GL_TEXTURE_2D, _texDepth);
-	glUniform1i(glGetUniformLocation(id, "shadowmap"), 3);
+	glUniform1i(glGetUniformLocation(id, "shadowmap"), 2);
 
   // draw the terrain
   glBindVertexArray(_vaoTerrain);
@@ -504,7 +502,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *me) {
 }
 
 void Viewer::keyPressEvent(QKeyEvent *ke) {
-  const float movementSpeed = 2.0;
+  const float movementSpeed = 10.0;
 
 	// keys zqsd: move camera
 	if(ke->key()==Qt::Key_Z) {
@@ -541,6 +539,11 @@ void Viewer::keyPressEvent(QKeyEvent *ke) {
   // key m: show the shadow map 
   if (ke->key()==Qt::Key_M) {
     _showShadowMap = !_showShadowMap;
+  }
+  
+  // key space: use the next texture
+  if (ke->key()==Qt::Key_Space) {
+    _currentTexture = (_currentTexture + 1) % 5;
   }
 
   updateGL();

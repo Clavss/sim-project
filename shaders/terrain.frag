@@ -10,7 +10,6 @@ in vec4 shadcoord;
 
 uniform vec3 light;
 uniform sampler2D texWater;
-uniform sampler2D texRock;
 uniform sampler2D normalmap;
 uniform sampler2DShadow shadowmap;
 
@@ -48,10 +47,6 @@ void main() {
 	// PCF
   v -= 0.2 * (1.0 - texture(shadowmap, vec3(shadcoord.xy, (shadcoord.z - b) / shadcoord.w)));
 	
-	//if (height > 0.08) {
-	//	outColorBuffer = texture2D(texRock, texcoord) * v;
-	//} else {
-		outColorBuffer = shading(texcoord, height, n, texWater) * v;
-	//}
+	outColorBuffer = shading(texcoord, height, n, texWater) * v;
 	outNormalBuffer = vec4(n, depth);
 }
